@@ -14,30 +14,45 @@ You can even achive true **GitOps** by doing `git pull` :)
 
 # Deployments
 [x] Read
+
 [x] Write
+
 [x] Copy
+
 [X] Delete
 
 # Configmaps
 [x] Read
+
 [x] Write
+
 [x] Copy
+
 [X] Delete
 
 # Pods
 [x] Read
+
 [X] Write
+
 [X] Copy
+
 [X] Delete
 
 # Services
 [] Read
+
 [] Write
+
 [] Copy
+
 [] Delete
 
 # Ingresses
 [x] Read
+
 [X] Write
+
 [X] Copy
+
 [X] Delete
