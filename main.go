@@ -1,4 +1,3 @@
-// Hellofs implements a simple "hello world" file system.
 package main
 
 import (
@@ -10,26 +9,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	//"syscall"
-	//"time"
-
-	//"k8s.io/apimachinery/pkg/api/errors"
-	//	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	_ "bazil.org/fuse/fs/fstestutil"
 	"github.com/sorenmat/kubefs/pkg/cluster"
 	"github.com/sorenmat/kubefs/pkg/kubernetes"
-	//	"k8s.io/client-go/tools/clientcmd/api"
 )
 
-var inode uint64 = 0
-var kubeconfig *string
-
-func getInode() uint64 {
-	inode = inode + 1
-	return inode
-}
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  %s MOUNTPOINT\n", os.Args[0])
@@ -72,11 +58,7 @@ func main() {
 	// Kubernetes stuff
 	x := kubernetes.Config()
 	clusters := []cluster.Cluster{}
-	for k, v := range x.Clusters {
-		fmt.Println("Server: ", v.Server)
-		fmt.Println("K", k)
-		context := kubernetes.FindContext(v.Server, x)
-		fmt.Println("context", context)
+	for k := range x.Clusters {
 		clusters = append(clusters, cluster.Cluster{Name: k, Context: x.CurrentContext, Client: kubernetes.Client(x.CurrentContext)})
 	}
 	err = fs.Serve(c, &FS{clusters: clusters})
