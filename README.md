@@ -40,7 +40,7 @@ You can even achive true **GitOps** by doing `git pull` :)
 [X] Delete
 
 # Services
-[] Read
+[X] Read
 
 [] Write
 

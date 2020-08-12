@@ -7,7 +7,6 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	"github.com/sorenmat/kubefs/pkg/cluster"
-	"github.com/sorenmat/kubefs/pkg/kubernetes"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,7 +40,7 @@ func (f *ConfigMapFile) Open(ctx context.Context, req *fuse.OpenRequest, resp *f
 }
 
 func (f *ConfigMapFile) reread() {
-	cli := kubernetes.Client(f.Cluster.Context)
+	cli := f.Client
 
 	deployment, err := cli.CoreV1().ConfigMaps(f.Namespace).Get(f.name, metav1.GetOptions{})
 	if err != nil {

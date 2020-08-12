@@ -4,6 +4,9 @@ go 1.14
 
 require (
 	bazil.org/fuse v0.0.0-20200424023519-3c101025617f
+	github.com/alecthomas/kingpin v2.2.6+incompatible
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
+	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	golang.org/x/crypto v0.0.0-20191108234033-bd318be0434a // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect

@@ -9,7 +9,6 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	"github.com/sorenmat/kubefs/pkg/cluster"
-	"github.com/sorenmat/kubefs/pkg/kubernetes"
 	"github.com/sorenmat/kubefs/pkg/namespace"
 )
 
@@ -45,7 +44,7 @@ func (d *ClusterDir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	fmt.Println("Clusters readdirall: ", d.Clusters)
 	for _, v := range d.Clusters {
 
-		x := &namespace.Dir{Dirent: fuse.Dirent{Name: v.Name, Type: fuse.DT_Dir}, Cluster: v, Client: kubernetes.Client(v.Context)}
+		x := &namespace.Dir{Dirent: fuse.Dirent{Name: v.Name, Type: fuse.DT_Dir}, Cluster: v, Client: v.Client}
 		d.Namespaces = append(d.Namespaces, x)
 		dirDirs = append(dirDirs, x.GetDirent())
 

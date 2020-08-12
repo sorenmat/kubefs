@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	_ "bazil.org/fuse/fs/fstestutil"
+	"github.com/alecthomas/kingpin"
 	"github.com/sorenmat/kubefs/pkg/cluster"
 	"github.com/sorenmat/kubefs/pkg/kubernetes"
 )
@@ -22,19 +24,23 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func main() {
+var (
+	mountpoint = kingpin.Arg("mountpoint", "Where to mount the kubernetes clusters.").Required().String()
+	kubeconfig = kingpin.Flag("kubeconfig", "Kuberntes config file to use").Default(filepath.Join(homeDir(), ".kube", "config")).Envar("KUBE_CONFIG").String()
+)
 
-	flag.Usage = usage
-	flag.Parse()
-
-	if flag.NArg() != 1 {
-		usage()
-		os.Exit(2)
+func homeDir() string {
+	if h := os.Getenv("HOME"); h != "" {
+		return h
 	}
-	mountpoint := flag.Arg(0)
+	return os.Getenv("USERPROFILE") // windows
+}
+
+func main() {
+	kingpin.Parse()
 
 	c, err := fuse.Mount(
-		mountpoint,
+		*mountpoint,
 		fuse.FSName("KubernetesFS"),
 		fuse.Subtype("kubefs"),
 	)
@@ -42,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer func() {
-		fuse.Unmount(mountpoint)
+		fuse.Unmount(*mountpoint)
 		c.Close()
 	}()
 	listener := make(chan os.Signal)
@@ -50,16 +56,16 @@ func main() {
 	go func() {
 		<-listener
 		fmt.Println("unmounting")
-		fuse.Unmount(mountpoint)
+		fuse.Unmount(*mountpoint)
 		c.Close()
 		os.Exit(1)
 	}()
 
 	// Kubernetes stuff
-	x := kubernetes.Config()
+	x := kubernetes.Config(*kubeconfig)
 	clusters := []cluster.Cluster{}
 	for k := range x.Clusters {
-		clusters = append(clusters, cluster.Cluster{Name: k, Context: x.CurrentContext, Client: kubernetes.Client(x.CurrentContext)})
+		clusters = append(clusters, cluster.Cluster{Name: k, Context: x.CurrentContext, Client: kubernetes.Client(*kubeconfig, x.CurrentContext)})
 	}
 	err = fs.Serve(c, &FS{clusters: clusters})
 	if err != nil {

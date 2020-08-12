@@ -1,10 +1,8 @@
 package kubernetes
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -19,32 +17,20 @@ func FindContext(server string, x *api.Config) string {
 	}
 	return ""
 }
-func configFile() string {
-	var kubeconfig *string
-	kf := os.Getenv("KUBECONFIG")
-	if kf != "" {
-		return os.Getenv("KUBECONFIG")
-	}
-	if home := homeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
 
-	return *kubeconfig
-}
-func Config() *api.Config {
+func Config(configfile string) *api.Config {
 
-	x, err := clientcmd.LoadFromFile(configFile())
+	x, err := clientcmd.LoadFromFile(configfile)
 	if err != nil {
 		panic(err.Error())
 	}
 	return x
 }
-func Client(context string) *kubernetes.Clientset {
+
+func Client(configfile string, context string) *kubernetes.Clientset {
 	fmt.Println("Getting client")
 
-	x, err := clientcmd.LoadFromFile(configFile())
+	x, err := clientcmd.LoadFromFile(configfile)
 	if err != nil {
 		panic(err.Error())
 	}
